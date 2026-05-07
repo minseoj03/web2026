@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .container{
+        border: 2px solid #333;
+        height: 300px;
+        position: relative;
+        padding: 20px;
+        }
+/* Relative: 원래 위치에서 20px씩 이동 */
+        .rel{
+        position: relative;
+        top: 20px;
+        left: 20px;
+        background: lightblue;
+        }
+/* Absolute: 부모인 .container 우측 하단에 고정 */
+        .abs{
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background: coral;
+        }
+/* Fixed: 스크롤해도 화면 좌측 상단에 고정 */
+        .fix{
+    position: fixed;
+    top: 50px;
+    left: 10px;
+    background: gold;
+    z-index: 100;
+        }
+    </style>
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+    <div class="box rel">Relative Box</div>
+    <div class="box abs">Absolute Box</div>
+    <p>스크롤을 내려도 노란 박스는 고정되어 있습니다.</p>
+    </div>
+    <div class="box fix">Fixed Box</div>
+    
+</body>
+</html>

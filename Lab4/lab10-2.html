@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>북마크 매니저</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .form {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .form input {
+            flex: 1;
+            padding: 0.5rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .name {
+            flex: 1;
+            cursor: pointer;
+            color: #0066cc;
+        }
+
+        .name:hover {
+            text-decoration: underline;
+        }
+
+        .star {
+            cursor: pointer;
+            user-select: none;
+            color: #ccc;
+            font-size: 1.2rem;
+        }
+
+        .star.active {
+            color: gold;
+        }
+
+        .delete-btn {
+            background: #ff5252;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>나의 북마크</h1>
+    <div class="form">
+        <input type="text" id="nameInput" placeholder="사이트 이름">
+        <input type="url" id="urlInput" placeholder="https://...">
+        <button id="addBtn">추가</button>
+    </div>
+    <ul id="bookmarkList"></ul>
+
+    <script>
+        const nameInput = document.querySelector('#nameInput');
+        const urlInput = document.querySelector('#urlInput');
+        const addBtn = document.querySelector('#addBtn');
+        const list = document.querySelector('#bookmarkList');
+
+        // 데이터 모델: [{ id, name, url, starred }, ...]
+        let bookmarks = [];
+
+// TODO 1: 페이지 로드 시 localStorage에서 bookmarks 배열 복원 + 렌더링
+//         힌트: JSON.parse, render() 호출
+        // 1. 페이지 로드 시 localStorage에서 bookmarks 배열 복원 + 렌더링
+        const saved = localStorage.getItem('bookmarks');    
+        if (saved) {
+            bookmarks = JSON.parse(saved);
+        }
+        render();
+
+// TODO 2: render() — bookmarks 배열을 화면에 그리기
+// 힌트: list.innerHTML = bookmarks.map(b => `<li data-id="${b.id}">...</li>`).join('')
+        function render() { 
+            //자바스크립트의 bookmarks 배열(북마크 목록 데이터)을 HTML 코드(리스트)로 변환해서 브라우저 화면에 실제로 보여주는 것
+            list.innerHTML = bookmarks.map(b => `
+                <li data-id="${b.id}">
+                    <span class="name">${b.name}</span>
+                    <span class="star ${b.starred ? 'active' : ''}">★</span>
+                    <button class="delete-btn">삭제</button>
+                </li>
+            `).join('');//이 배열을 하나의 긴 문자열로 합쳐서 list.innerHTML에 넣기 위해 사용
+        }
+
+// TODO 3: 추가 버튼 — 이름+URL 받아서 bookmarks에 추가 + 저장 + 렌더링
+        addBtn.addEventListener('click', () => {
+            const name = nameInput.value.trim();
+            const url = urlInput.value.trim();
+            if (name && url) {// 이름과 URL이 모두 입력된 경우에만 추가
+                const newBookmark = { // 새로운 북마크 객체 생성
+                    id: Date.now(),
+                    name,
+                    url,
+                    starred: false
+                };
+                bookmarks.push(newBookmark); // bookmarks 배열에 새 북마크 추가
+                localStorage.setItem('bookmarks', JSON.stringify(bookmarks)); // localStorage에 저장
+                render();
+                nameInput.value = '';
+                urlInput.value = '';
+            }
+        });
+
+// TODO 4: 이벤트 위임 — list에 click 1개로 별표 토글 / 삭제 / 사이트명 클릭 시 window.open
+        list.addEventListener('click', (e) => {
+            const target = e.target;
+            const li = target.closest('li');
+            if (!li) return;
+
+            const id = Number(li.dataset.id);
+            const bookmark = bookmarks.find(b => b.id === id);
+
+            if (target.classList.contains('star')) {// 별표 클릭
+                bookmark.starred = !bookmark.starred;
+                localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+                render();
+            } else if (target.classList.contains('delete-btn')) { // 삭제 버튼 클릭
+                bookmarks = bookmarks.filter(b => b.id !== id);
+                localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+                render();
+            } else { // 사이트명 클릭
+                window.open(bookmark.url, '_blank');
+            }
+        });
+    </script>
+</body>
+
+</html>
